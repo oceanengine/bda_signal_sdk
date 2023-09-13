@@ -10,5 +10,8 @@ SDK支持pod方式接入，只需配置pod环境，在podfile文件中加入以�
 
 ```Objective-C
 pod  'BDASignalSDK' 
+
+// BDASignalSDK内部依赖Protobuf
 pod  'Protobuf'
 ```
+
