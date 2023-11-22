@@ -100,7 +100,7 @@
     if (key.length > 0) {
         [BDASignalUtility requestSignalWithParams:@{
             @"event_name" : key,
-            @"params" : [BDASignalUtility bda_jsonStringEncodedWithDict:params] ?: @{}
+            @"params" : params ?: @{}
         }];
     }
 }
