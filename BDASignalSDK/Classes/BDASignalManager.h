@@ -73,6 +73,17 @@
 + (BOOL)getIdfaStatus;
 
 /**
+ 开启延时上报 配合下方允许上报按钮使用
+ 主要用户需要同意隐私协议等场景
+ */
++ (void)enableDelayUpload;
+
+/**
+ 允许上报，配合上方开启延时上报功能使用
+ */
++ (void)startSendingEvnets;
+
+/**
  clickid
  */
 @property (nonatomic, copy) NSString *clickid;

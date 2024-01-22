@@ -18,6 +18,8 @@
 @property (nonatomic, copy) NSString *webViewUA;
 @property (nonatomic, copy) NSString *openUrl;
 @property (nonatomic, assign) BOOL canCollectIdfa;
+@property (nonatomic, assign) BOOL enableDelayEvent;
+@property (nonatomic, strong) NSMutableArray *cacheArray;
 
 @end
 
@@ -48,6 +50,12 @@
     // 解析clickid
     [self anylyseDeeplinkClickidWithOptions:launchOptions connectOptions:connetOptions];
     
+    if ([BDASignalManager sharedInstance].enableDelayEvent) {
+        [[BDASignalManager sharedInstance].cacheArray addObject:@{
+            @"event_name" : @"launch_app",
+        }];
+        return;
+    }
     [BDASignalUtility requestSignalWithParams:@{
         @"event_name" : @"launch_app",
     }];
@@ -98,6 +106,13 @@
 
 + (void)trackEssentialEventWithName:(NSString *)key params:(NSDictionary *)params {
     if (key.length > 0) {
+        if ([BDASignalManager sharedInstance].enableDelayEvent) {
+            [[BDASignalManager sharedInstance].cacheArray addObject:@{
+                @"event_name" : key,
+                @"params" : params ?: @{}
+            }];
+            return;
+        }
         [BDASignalUtility requestSignalWithParams:@{
             @"event_name" : key,
             @"params" : params ?: @{}
@@ -143,6 +158,21 @@
     self.clickid = clickid;
     
     self.openUrl = [userDefaults objectForKey:@"kBDASignalOpenUrl"];
+}
+
++ (void)enableDelayUpload {
+    [BDASignalManager sharedInstance].enableDelayEvent = YES;
+    [BDASignalManager sharedInstance].cacheArray = [NSMutableArray array];
+}
+
++ (void)startSendingEvnets {
+    [BDASignalManager sharedInstance].enableDelayEvent = NO;
+    // 触发未上报的缓存事件
+    [[BDASignalManager sharedInstance].cacheArray enumerateObjectsUsingBlock:^(NSDictionary *obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        [BDASignalUtility requestSignalWithParams:obj];
+    }];
+    [[BDASignalManager sharedInstance].cacheArray removeAllObjects];
+    [BDASignalManager sharedInstance].cacheArray = nil;
 }
 
 @end
