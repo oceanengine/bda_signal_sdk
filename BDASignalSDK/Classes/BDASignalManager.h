@@ -81,7 +81,7 @@
 /**
  允许上报，配合上方开启延时上报功能使用
  */
-+ (void)startSendingEvnets;
++ (void)startSendingEvents;
 
 /**
  clickid

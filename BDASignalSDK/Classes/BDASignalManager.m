@@ -165,7 +165,7 @@
     [BDASignalManager sharedInstance].cacheArray = [NSMutableArray array];
 }
 
-+ (void)startSendingEvnets {
++ (void)startSendingEvents {
     [BDASignalManager sharedInstance].enableDelayEvent = NO;
     // 触发未上报的缓存事件
     [[BDASignalManager sharedInstance].cacheArray enumerateObjectsUsingBlock:^(NSDictionary *obj, NSUInteger idx, BOOL * _Nonnull stop) {

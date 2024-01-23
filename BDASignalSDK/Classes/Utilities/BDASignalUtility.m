@@ -48,7 +48,7 @@
     pbHeader.deviceMntId = [self mntID];
     pbHeader.deviceInitTime = [self deviceInitTime];
     pbHeader.userAgent = [self webviewUA];
-    pbHeader.sdkVersion = @"1.0.0";
+    pbHeader.sdkVersion = @"1.0.1";
     pbHeader.clickId = [BDASignalManager getClickId];
     
     NSDictionary *appInfo = [[NSBundle mainBundle] infoDictionary];
