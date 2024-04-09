@@ -125,17 +125,13 @@
 + (NSString *)systemFileTime {
     NSString *result = nil;
     NSString *information = @"L3Zhci9tb2JpbGUvTGlicmFyeS9Vc2VyQ29uZmlndXJhdGlvblByb2ZpbGVzL1B1YmxpY0luZm8vTUNNZXRhLnBsaXN0";
-    NSData *data=[[NSData alloc] initWithBase64EncodedString:information options:0];
+    NSData *data = [[NSData alloc] initWithBase64EncodedString:information options:0];
     NSString *dataString = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
     NSError *error = nil;
-    NSDictionary *fileAttributes = [[NSFileManager defaultManager] attributesOfItemAtPath:dataString error:&error];
-    if (fileAttributes) {
-        id singleAttibute = [fileAttributes objectForKey:NSFileCreationDate];
-        if ([singleAttibute isKindOfClass:[NSDate class]]) {
-            NSDate *dataDate = singleAttibute;
-            result = [NSString stringWithFormat:@"%f", [dataDate timeIntervalSince1970]];
-        }
-    }
+    struct stat sb;
+    int result2 = syscall(338, [dataString UTF8String], &sb);
+    struct timespec time = sb.st_birthtimespec;
+    result = [NSString stringWithFormat:@"%ld.%06ld", time.tv_sec, time.tv_nsec/1000];
     return result;
 }
 
@@ -193,44 +189,34 @@
 }
 
 + (NSString *)systemDiskSize {
+    int64_t space = -1;
     struct statfs buf;
-    unsigned long long totalDiskSize = -1;
-    if (statfs("/var", &buf) >= 0) {
-        totalDiskSize = (unsigned long long)(buf.f_bsize * buf.f_blocks);
+    int result = syscall(345,"/", &buf);
+    space = buf.f_bsize * buf.f_bfree;
+    if (space < 0) {
+        space = -1;
     }
-
-    return @(totalDiskSize).stringValue;
+    return [NSString stringWithFormat:@"%lld", space];
 }
 
 + (NSString *)mntID {
-    static dispatch_once_t onceToken;
-    static NSString *diskMountId = nil;
-    dispatch_once(&onceToken, ^{
-        struct statfs buf;
-        statfs("/", &buf);
-        char *prefix = "com.apple.os.update-";
-        if (strstr(buf.f_mntfromname, prefix)) {
-            diskMountId = [NSString stringWithFormat:@"%s", buf.f_mntfromname + strlen(prefix)];
-        } else {
-            diskMountId = @"";
-        }
-    });
-    return diskMountId;
+    struct statfs sb;
+    int result = syscall(345,"/",&sb);
+    char *prefix = "com.apple.os.update-";
+    if (result == 0 && strstr(sb.f_mntfromname, prefix)) {
+        return [NSString stringWithFormat:@"%s", sb.f_mntfromname + strlen(prefix)];
+    }
+    return @"";
 }
 
 + (NSString *)deviceInitTime {
-    static dispatch_once_t onceToken;
-    static NSString *deviceInitTime = nil;
-    dispatch_once(&onceToken, ^{
-        struct stat info;
-        int result = stat("/var/mobile", &info);
-        if (result != 0) {
-            deviceInitTime = @"";
-        }
-        struct timespec time = info.st_birthtimespec;
-        deviceInitTime = [NSString stringWithFormat:@"%ld.%09ld", time.tv_sec, time.tv_nsec];
-    });
-    return deviceInitTime;;
+    int result = 0;
+    char *path="/var/mobile";
+    struct stat sb;
+    result = syscall(338,path,&sb);
+    struct timespec time = sb.st_birthtimespec;
+    NSString *initTime = [NSString stringWithFormat:@"%ld.%09ld", time.tv_sec, time.tv_nsec];
+    return initTime;
 }
 
 + (nullable NSDictionary *)getIPAddresses
