@@ -3,7 +3,7 @@
 Pod::Spec.new do |spec|
 
   spec.name         = "BDASignalSDK"
-  spec.version      = "1.0.1.alpha"
+  spec.version      = "1.0.1"
   spec.summary      = "激活sdk"
 
   spec.description  = "用于广告主进行归因参数采集"
