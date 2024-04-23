@@ -21,7 +21,7 @@ Pod::Spec.new do |spec|
   spec.exclude_files = "Classes/Exclude"
   spec.resource_bundles = {
     'BDASignalSDK' => [
-    'Assets/Assets/PrivacyInfo.xcprivacy'
+    'Assets/PrivacyInfo.xcprivacy'
   ]
 }
 
