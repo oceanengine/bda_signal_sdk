@@ -19,6 +19,11 @@ Pod::Spec.new do |spec|
 
   spec.source_files  = "BDASignalSDK", "BDASignalSDK/**/*.{h,m}"
   spec.exclude_files = "Classes/Exclude"
+  spec.resource_bundles = {
+    'BDASignalSDK' => [
+    'Assets/Assets/PrivacyInfo.xcprivacy'
+  ]
+}
 
   # spec.public_header_files = "Classes/**/*.h"
   spec.dependency 'Protobuf'
