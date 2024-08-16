@@ -175,4 +175,12 @@
     [BDASignalManager sharedInstance].cacheArray = nil;
 }
 
+#pragma mark lazy
+- (NSMutableDictionary *)extraParam {
+    if (!_extraParam) {
+        _extraParam = [NSMutableDictionary dictionary];
+    }
+    return _extraParam;
+}
+
 @end
