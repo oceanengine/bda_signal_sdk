@@ -1,23 +1,16 @@
 PODS:
-  - BDASignalSDK (0.0.1):
-    - Protobuf
-  - Protobuf (3.24.3)
+  - BDASignalSDK (1.0.2)
 
 DEPENDENCIES:
   - BDASignalSDK (from `../`)
-
-SPEC REPOS:
-  trunk:
-    - Protobuf
 
 EXTERNAL SOURCES:
   BDASignalSDK:
     :path: "../"
 
 SPEC CHECKSUMS:
-  BDASignalSDK: d7292ba9b6f629b595a506089b73535efefd79b0
-  Protobuf: 970f7ee93a3a08e3cf64859b8efd95ee32b4f87f
+  BDASignalSDK: 02cb83424d8a11f7933bc10b98023fd5fb34f5ee
 
 PODFILE CHECKSUM: 768d0724dddf0e751f82552bcaa03ddeca87a52d
 
-COCOAPODS: 1.11.3
+COCOAPODS: 1.15.2

@@ -6,19 +6,8 @@
 	objectVersion = 56;
 	objects = {
 
-/* Begin PBXBuildFile section */
-		2BFABE082A7792A200AC8BCB /* BDASignalSDK.docc in Sources */ = {isa = PBXBuildFile; fileRef = 2BFABE072A7792A200AC8BCB /* BDASignalSDK.docc */; };
-		2BFABE092A7792A200AC8BCB /* BDASignalSDK.h in Headers */ = {isa = PBXBuildFile; fileRef = 2BFABE062A7792A200AC8BCB /* BDASignalSDK.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		2BFABE102A77934D00AC8BCB /* Classes in Resources */ = {isa = PBXBuildFile; fileRef = 2BFABE0F2A77934D00AC8BCB /* Classes */; };
-		AC32AE5BE226F1A8A78BC7E7 /* Pods_BDASignalSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D614215E8E219D51CD831D97 /* Pods_BDASignalSDK.framework */; };
-/* End PBXBuildFile section */
-
 /* Begin PBXFileReference section */
 		2BFABE032A7792A200AC8BCB /* BDASignalSDK.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = BDASignalSDK.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		2BFABE062A7792A200AC8BCB /* BDASignalSDK.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BDASignalSDK.h; sourceTree = "<group>"; };
-		2BFABE072A7792A200AC8BCB /* BDASignalSDK.docc */ = {isa = PBXFileReference; lastKnownFileType = folder.documentationcatalog; path = BDASignalSDK.docc; sourceTree = "<group>"; };
-		2BFABE0F2A77934D00AC8BCB /* Classes */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Classes; sourceTree = "<group>"; };
-		D614215E8E219D51CD831D97 /* Pods_BDASignalSDK.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_BDASignalSDK.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		EC2E0C000F2F70A507AD2F61 /* Pods-BDASignalSDK.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BDASignalSDK.release.xcconfig"; path = "Target Support Files/Pods-BDASignalSDK/Pods-BDASignalSDK.release.xcconfig"; sourceTree = "<group>"; };
 		EFCCBC3100ADA8D1099B8D16 /* Pods-BDASignalSDK.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BDASignalSDK.debug.xcconfig"; path = "Target Support Files/Pods-BDASignalSDK/Pods-BDASignalSDK.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -28,7 +17,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				AC32AE5BE226F1A8A78BC7E7 /* Pods_BDASignalSDK.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -38,7 +26,6 @@
 		06BFE6AAA556BECDAB1A2F26 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				D614215E8E219D51CD831D97 /* Pods_BDASignalSDK.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -49,14 +36,12 @@
 				EFCCBC3100ADA8D1099B8D16 /* Pods-BDASignalSDK.debug.xcconfig */,
 				EC2E0C000F2F70A507AD2F61 /* Pods-BDASignalSDK.release.xcconfig */,
 			);
-			name = Pods;
 			path = Pods;
 			sourceTree = "<group>";
 		};
 		2BFABDF92A7792A200AC8BCB = {
 			isa = PBXGroup;
 			children = (
-				2BFABE052A7792A200AC8BCB /* BDASignalSDK */,
 				2BFABE042A7792A200AC8BCB /* Products */,
 				24DDB0080A8F9D25CCB1312E /* Pods */,
 				06BFE6AAA556BECDAB1A2F26 /* Frameworks */,
@@ -71,16 +56,6 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		2BFABE052A7792A200AC8BCB /* BDASignalSDK */ = {
-			isa = PBXGroup;
-			children = (
-				2BFABE0F2A77934D00AC8BCB /* Classes */,
-				2BFABE062A7792A200AC8BCB /* BDASignalSDK.h */,
-				2BFABE072A7792A200AC8BCB /* BDASignalSDK.docc */,
-			);
-			path = BDASignalSDK;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -88,7 +63,6 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2BFABE092A7792A200AC8BCB /* BDASignalSDK.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -151,7 +125,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2BFABE102A77934D00AC8BCB /* Classes in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -187,7 +160,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2BFABE082A7792A200AC8BCB /* BDASignalSDK.docc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

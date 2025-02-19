@@ -3,7 +3,7 @@
 Pod::Spec.new do |spec|
 
   spec.name         = "BDASignalSDK"
-  spec.version      = "1.0.2"
+  spec.version      = "1.0.3"
   spec.summary      = "激活sdk"
 
   spec.description  = "用于广告主进行归因参数采集"
@@ -26,7 +26,7 @@ Pod::Spec.new do |spec|
 }
 
   # spec.public_header_files = "Classes/**/*.h"
-  spec.dependency 'Protobuf'
+  # spec.dependency 'Protobuf'
 
 
 end

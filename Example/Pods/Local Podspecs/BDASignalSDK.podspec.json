@@ -1,8 +1,8 @@
 {
   "name": "BDASignalSDK",
-  "version": "0.0.1",
-  "summary": "A short description of BDASignalSDK.",
-  "description": "归因参数采集SDK",
+  "version": "1.0.2",
+  "summary": "激活sdk",
+  "description": "用于广告主进行归因参数采集",
   "homepage": "home",
   "license": {
     "type": "MIT",
@@ -16,17 +16,17 @@
   },
   "source": {
     "git": "https://github.com/oceanengine/bda_signal_sdk.git",
-    "branch": "develop",
-    "tag": "0.0.1"
+    "branch": "main",
+    "tag": "1.0.2"
   },
   "source_files": [
     "BDASignalSDK",
     "BDASignalSDK/**/*.{h,m}"
   ],
   "exclude_files": "Classes/Exclude",
-  "dependencies": {
-    "Protobuf": [
-
+  "resource_bundles": {
+    "BDASignalSDK": [
+      "Assets/PrivacyInfo.xcprivacy"
     ]
   }
 }

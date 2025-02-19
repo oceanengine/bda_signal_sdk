@@ -21,6 +21,11 @@ FOUNDATION_EXTERN NSString * _Nonnull const kBDADSignalSDKEventRegister;
 FOUNDATION_EXTERN NSString * _Nonnull const kBDADSignalSDKEventPurchase;
 FOUNDATION_EXTERN NSString * _Nonnull const kBDADSignalSDKEventGameAddiction;
 
+/**
+ sdk版本号
+ */
+FOUNDATION_EXTERN NSString * _Nonnull const kBDADSignalSDKVersion;
+
 @interface BDASignalDefinitions : NSObject
 
 @end

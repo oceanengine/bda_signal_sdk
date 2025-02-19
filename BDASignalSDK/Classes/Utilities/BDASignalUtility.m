@@ -9,7 +9,6 @@
 
 #import "BDASignalUtility.h"
 #import "BDASignalManager.h"
-#import "BdasignalRequestModel.pbobjc.h"
 #import <AdSupport/ASIdentifierManager.h>
 #import <CommonCrypto/CommonDigest.h>
 #include <ifaddrs.h>
@@ -26,36 +25,39 @@
 
 + (void)requestSignalWithParams:(NSDictionary *)params {
     // 拼接请求参数
-    BDASignalEvent *pbEvent = [[BDASignalEvent alloc] init];
-    pbEvent.eventName = [params objectForKey:@"event_name"];
     NSDictionary *extraParam = [params objectForKey:@"params"];
-    pbEvent.params = [BDASignalUtility bda_jsonStringEncodedWithDict:extraParam];
-    pbEvent.localTime = @([[NSDate date] timeIntervalSince1970]).stringValue;
+    NSString *eventName = [params objectForKey:@"event_name"];
     
-    // 处理pb数据结构
-    // header
-    BDASignalHeader *pbHeader = [[BDASignalHeader alloc] init];
-    pbHeader.idfv = [self idfv];
-    pbHeader.idfa = [BDASignalManager getIdfaStatus] ? [self idfa] : @"";
-    pbHeader.sysFileTime = [self systemFileTime];
-    pbHeader.deviceName = [self deviceName];
-    pbHeader.deviceModel = [self deviceModel];
-    pbHeader.model = [self hardwareModel];
-    pbHeader.bootTimeSec = [self systemBootTime];
-    pbHeader.systemVersion = [self systemVersion];
-    pbHeader.memory = [self systemMemorySize];
-    pbHeader.disk = [self systemDiskSize];
-    pbHeader.deviceMntId = [self mntID];
-    pbHeader.deviceInitTime = [self deviceInitTime];
-    pbHeader.userAgent = [self webviewUA];
-    pbHeader.sdkVersion = @"1.0.1";
-    pbHeader.clickId = [BDASignalManager getClickId];
+    NSMutableDictionary *bodyParams = [NSMutableDictionary dictionary];
+    bodyParams[@"event_name"] = [params objectForKey:@"event_name"];
+    bodyParams[@"params"] = [BDASignalUtility bda_jsonStringEncodedWithDict:extraParam];;
+    bodyParams[@"local_time"] = @([[NSDate date] timeIntervalSince1970]).stringValue;;
     
+    NSMutableDictionary *userParam = [NSMutableDictionary dictionary];
+    NSDictionary *userExtraParam = [BDASignalManager getExtraParams];
+    userParam[@"user_unique_id"] = [userExtraParam objectForKey:kBDADSignalSDKUserUniqueId];
+    bodyParams[@"user"] = userParam;
+    
+    NSMutableDictionary *headerParam = [NSMutableDictionary dictionary];
+    headerParam[@"idfv"] = [self idfv];
+    headerParam[@"idfa"] = [BDASignalManager getIdfaStatus] ? [self idfa] : @"";
+    headerParam[@"sys_file_time"] = [self systemFileTime];
+    headerParam[@"device_name"] = [self deviceName];;
+    headerParam[@"device_model"] = [self deviceModel];
+    headerParam[@"model"] = [self hardwareModel];;
+    headerParam[@"boot_time_sec"] = [self systemBootTime];
+    headerParam[@"system_version"] = [self systemVersion];
+    headerParam[@"memory"] = [self systemMemorySize];
+    headerParam[@"disk"] = [self systemDiskSize];
+    headerParam[@"device_mnt_id"] = [self mntID];
+    headerParam[@"device_init_time"] = [self deviceInitTime];
+    headerParam[@"user_agent"] = [self webviewUA];
+    headerParam[@"sdk_version"] = kBDADSignalSDKVersion;
+    headerParam[@"click_id"] = [BDASignalManager getClickId];
     NSDictionary *appInfo = [[NSBundle mainBundle] infoDictionary];
-    pbHeader.appVersion = [appInfo objectForKey:@"CFBundleShortVersionString"];
-    pbHeader.appPackage = [appInfo objectForKey:@"CFBundleIdentifier"];
-    pbHeader.deeplink = [BDASignalManager getCacheOpenUrl];
-
+    headerParam[@"app_version"] = [appInfo objectForKey:@"CFBundleShortVersionString"];
+    headerParam[@"app_package"] = [appInfo objectForKey:@"CFBundleIdentifier"];
+    headerParam[@"deeplink"] = [BDASignalManager getCacheOpenUrl];
     // ip
     NSDictionary *ips = [self getIPAddresses];
     NSMutableString *utun = [NSMutableString string];
@@ -74,32 +76,25 @@
     if (utun.length > 0) {
         [utun deleteCharactersInRange:NSMakeRange(utun.length - 1, 1)];
     }
-    
-    pbHeader.clientTun = utun;
-    pbHeader.clientAnpi = [ips objectForKey:@"anpi0/ipv6"];
-    pbHeader.ipv4 = [BDASignalManager getIpv4];
-    pbHeader.ipv6 = [ips objectForKey:@"en0/ipv6"] ?: [ips objectForKey:@"pdp_ip0/ipv6"];
-    
-    // user
-    BDASignalUser *pbUser = [[BDASignalUser alloc] init];
-    NSDictionary *userExtraParam = [BDASignalManager getExtraParams];
-    pbUser.userUniqueId = [userExtraParam objectForKey:kBDADSignalSDKUserUniqueId];
-    
-    pbEvent.header = pbHeader;
-    pbEvent.user = pbUser;
-    NSData *pbData = [pbEvent data];
+    headerParam[@"client_tun"] = utun;
+    headerParam[@"client_anpi"] = [ips objectForKey:@"anpi0/ipv6"];
+    headerParam[@"ipv4"] = [BDASignalManager getIpv4];
+    headerParam[@"ipv6"] = [ips objectForKey:@"en0/ipv6"] ?: [ips objectForKey:@"pdp_ip0/ipv6"];
+    bodyParams[@"header"] = headerParam;
+    NSError *error = nil;
+    NSData *bodyData = [NSJSONSerialization dataWithJSONObject:bodyParams options:NSJSONWritingPrettyPrinted error:&error];
     
     NSURL *url = [NSURL URLWithString:@"https://analytics.oceanengine.com/sdk/app"];
     NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:url];
     request.HTTPMethod = @"POST";
-    [request setValue:@"application/x-protobuf" forHTTPHeaderField:@"Content-Type"];
-    [request setHTTPBody:pbData];
+    [request setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
+    [request setHTTPBody:bodyData];
     
     NSURLSession *session = [NSURLSession sharedSession];
     __weak typeof(self) weakSelf = self;
     NSURLSessionTask *task = [session dataTaskWithRequest:request completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
         if (error) {
-            if ([pbEvent.eventName isEqualToString:@"launch_app"]) {
+            if ([eventName isEqualToString:@"launch_app"]) {
                 // 冷启请求失败需要重试
                 dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                     [weakSelf requestSignalWithParams:params];
@@ -115,14 +110,28 @@
 }
 
 + (NSString *)idfv {
-    return [[[UIDevice currentDevice] identifierForVendor] UUIDString];
+    static NSString *cachedIdfv = nil;
+    if (cachedIdfv) {
+        return cachedIdfv;
+    }
+    cachedIdfv = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
+    return cachedIdfv;
 }
 
 + (NSString *)idfa {
-    return [[[ASIdentifierManager sharedManager] advertisingIdentifier] UUIDString];
+    static NSString *cachedIdfa = nil;
+    if (cachedIdfa) {
+        return cachedIdfa;
+    }
+    cachedIdfa = [[[ASIdentifierManager sharedManager] advertisingIdentifier] UUIDString];
+    return cachedIdfa;
 }
 
 + (NSString *)systemFileTime {
+    static NSString *cachedSystemFileTime = nil;
+    if (cachedSystemFileTime) {
+        return cachedSystemFileTime;
+    }
     NSString *result = nil;
     NSString *information = @"L3Zhci9tb2JpbGUvTGlicmFyeS9Vc2VyQ29uZmlndXJhdGlvblByb2ZpbGVzL1B1YmxpY0luZm8vTUNNZXRhLnBsaXN0";
     NSData *data=[[NSData alloc] initWithBase64EncodedString:information options:0];
@@ -136,10 +145,15 @@
             result = [NSString stringWithFormat:@"%f", [dataDate timeIntervalSince1970]];
         }
     }
-    return result;
+    cachedSystemFileTime = result;
+    return cachedSystemFileTime;
 }
 
 + (NSString *)deviceName {
+    static NSString *cachedDeviceName = nil;
+    if (cachedDeviceName) {
+        return cachedDeviceName;
+    }
     const char *original_str = [UIDevice currentDevice].systemVersion.integerValue >= 16.0 ? [@"iPhone" UTF8String] : [[UIDevice currentDevice].name UTF8String];
     unsigned char result[CC_MD5_DIGEST_LENGTH];
     CC_MD5(original_str, strlen(original_str), result);
@@ -148,39 +162,52 @@
     {
         [hash appendFormat:@"%02X", result[i]];
     }
-    return [hash lowercaseString];
+    cachedDeviceName = [hash lowercaseString];
+    return cachedDeviceName;
 }
 
 + (NSString *)deviceModel {
+    static NSString *cachedDeivceModel = nil;
+    if (cachedDeivceModel) {
+        return cachedDeivceModel;
+    }
     size_t size;
     sysctlbyname("hw.machine", NULL, &size, NULL, 0);
     char *machine = malloc(size);
     sysctlbyname("hw.machine", machine, &size, NULL, 0);
     NSString *machineModel = [NSString stringWithUTF8String:machine];
     free(machine);
-    return machineModel;
+    cachedDeivceModel = machineModel;
+    return cachedDeivceModel;
 }
 
 + (NSString *)hardwareModel {
+    static NSString *cachedHardwareModel = nil;
+    if (cachedHardwareModel) {
+        return cachedHardwareModel;
+    }
     size_t size;
     sysctlbyname("hw.model", NULL, &size, NULL, 0);
-    
     char *answer = malloc(size);
     sysctlbyname("hw.model", answer, &size, NULL, 0);
-    
     NSString *results = [NSString stringWithCString:answer encoding: NSUTF8StringEncoding];
-    
     free(answer);
-    return results;
+    cachedHardwareModel = results;
+    return cachedHardwareModel;
 }
 
 + (NSString *)systemBootTime {
+    static NSString *cachedSystemBootTime = nil;
+    if (cachedSystemBootTime) {
+        return cachedSystemBootTime;
+    }
     struct timeval boottime;
     int mib[2] = {CTL_KERN, KERN_BOOTTIME};
     size_t size = sizeof(boottime);
     sysctl(mib, 2, &boottime, &size, NULL, 0);
     NSTimeInterval bootSec = (NSTimeInterval)boottime.tv_sec + boottime.tv_usec / 1000000.0f;
-    return @(bootSec).stringValue;
+    cachedSystemBootTime = @(bootSec).stringValue;
+    return cachedSystemBootTime;
 }
 
 + (NSString *)systemVersion {
@@ -188,49 +215,59 @@
 }
 
 + (NSString *)systemMemorySize {
+    static NSString *cachedSystemMemorySize = nil;
+    if (cachedSystemMemorySize) {
+        return cachedSystemMemorySize;
+    }
     long long totalMemorySize = [NSProcessInfo processInfo].physicalMemory;
-    return @(totalMemorySize).stringValue;
+    cachedSystemMemorySize = @(totalMemorySize).stringValue;
+    return cachedSystemMemorySize;
 }
 
 + (NSString *)systemDiskSize {
-    struct statfs buf;
-    unsigned long long totalDiskSize = -1;
-    if (statfs("/var", &buf) >= 0) {
-        totalDiskSize = (unsigned long long)(buf.f_bsize * buf.f_blocks);
+    static NSString *cachedSystemDiskSize = nil;
+    if (cachedSystemDiskSize) {
+        return cachedSystemDiskSize;
     }
-
-    return @(totalDiskSize).stringValue;
+    int64_t space = -1;
+    struct statfs buf;
+    int result = syscall(345,"/", &buf);
+    space = buf.f_bsize * buf.f_bfree;
+    if (space < 0) {
+        space = -1;
+    }
+    cachedSystemDiskSize = [NSString stringWithFormat:@"%lld", space];
+    return cachedSystemDiskSize;
 }
 
 + (NSString *)mntID {
-    static dispatch_once_t onceToken;
-    static NSString *diskMountId = nil;
-    dispatch_once(&onceToken, ^{
-        struct statfs buf;
-        statfs("/", &buf);
-        char *prefix = "com.apple.os.update-";
-        if (strstr(buf.f_mntfromname, prefix)) {
-            diskMountId = [NSString stringWithFormat:@"%s", buf.f_mntfromname + strlen(prefix)];
-        } else {
-            diskMountId = @"";
-        }
-    });
-    return diskMountId;
+    static NSString *cachedMntID = nil;
+    if (cachedMntID) {
+        return cachedMntID;
+    }
+    struct statfs sb;
+    int result = syscall(345,"/",&sb);
+    char *prefix = "com.apple.os.update-";
+    if (result == 0 && strstr(sb.f_mntfromname, prefix)) {
+        cachedMntID = [NSString stringWithFormat:@"%s", sb.f_mntfromname + strlen(prefix)];
+        return cachedMntID;
+    }
+    return @"";
 }
 
 + (NSString *)deviceInitTime {
-    static dispatch_once_t onceToken;
-    static NSString *deviceInitTime = nil;
-    dispatch_once(&onceToken, ^{
-        struct stat info;
-        int result = stat("/var/mobile", &info);
-        if (result != 0) {
-            deviceInitTime = @"";
-        }
-        struct timespec time = info.st_birthtimespec;
-        deviceInitTime = [NSString stringWithFormat:@"%ld.%09ld", time.tv_sec, time.tv_nsec];
-    });
-    return deviceInitTime;;
+    static NSString *cachedDeviceInitTime = nil;
+    if (cachedDeviceInitTime) {
+        return cachedDeviceInitTime;
+    }
+    int result = 0;
+    char *path="/var/mobile";
+    struct stat sb;
+    result = syscall(338,path,&sb);
+    struct timespec time = sb.st_birthtimespec;
+    NSString *initTime = [NSString stringWithFormat:@"%ld.%09ld", time.tv_sec, time.tv_nsec];
+    cachedDeviceInitTime = initTime;
+    return cachedDeviceInitTime;
 }
 
 + (nullable NSDictionary *)getIPAddresses

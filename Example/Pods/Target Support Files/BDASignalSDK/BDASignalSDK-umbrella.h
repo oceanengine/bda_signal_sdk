@@ -13,7 +13,6 @@
 #import "BDASignalSDK.h"
 #import "BDASignalDefinitions.h"
 #import "BDASignalManager.h"
-#import "BdasignalRequestModel.pbobjc.h"
 #import "BDASignalUtility.h"
 
 FOUNDATION_EXPORT double BDASignalSDKVersionNumber;
