@@ -1,6 +1,5 @@
 //
 //  BDASignalDefinitions.h
-//  guiyinTest
 //
 //  Created by ByteDance on 2023/7/26.
 //  Copyright 2023 Beijing Ocean Engine Network Technology Co., Ltd. 

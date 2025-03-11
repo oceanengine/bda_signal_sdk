@@ -1,6 +1,5 @@
 //
 //  BDASignalManager.m
-//  guiyinTest
 //
 //  Created by ByteDance on 2023/7/26.
 //  Copyright 2023 Beijing Ocean Engine Network Technology Co., Ltd. 
@@ -8,6 +7,7 @@
 
 #import "BDASignalManager.h"
 #import "BDASignalUtility.h"
+#import <StoreKit/StoreKit.h>
 #import <UIKit/UISceneOptions.h>
 #import <UIKit/UIOpenURLContext.h>
 #import <WebKit/WKWebView.h>
@@ -30,14 +30,18 @@
 }
 
 + (instancetype)sharedInstance {
-    static BDASignalManager *manager;
+    static BDASignalManager *manager = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        manager = [[BDASignalManager alloc] init];
-        [BDASignalUtility getInternetIpv4WithResult:^(NSString *ipv4) {
-            manager.ipv4 = ipv4;
-        }];
-        [manager preGetCachedData];
+        NSLocale *locale = [NSLocale currentLocale];
+        NSString *code = [locale objectForKey:NSLocaleCountryCode];
+        if ([code isEqualToString:@"CN"]) {
+            manager = [[BDASignalManager alloc] init];
+            [BDASignalUtility getInternetIpv4WithResult:^(NSString *ipv4) {
+                manager.ipv4 = ipv4;
+            }];
+            [manager preGetCachedData];
+        }
     });
     return manager;
 }
@@ -47,6 +51,10 @@
 }
 
 + (void)didFinishLaunchingWithOptions:(NSDictionary *)launchOptions connectOptions:(UISceneConnectionOptions *)connetOptions{
+    if (![BDASignalManager sharedInstance]) {
+        return;
+    }
+    
     // 解析clickid
     [self anylyseDeeplinkClickidWithOptions:launchOptions connectOptions:connetOptions];
     
@@ -105,6 +113,9 @@
 }
 
 + (void)trackEssentialEventWithName:(NSString *)key params:(NSDictionary *)params {
+    if (![BDASignalManager sharedInstance]) {
+        return;
+    }
     if (key.length > 0) {
         if ([BDASignalManager sharedInstance].enableDelayEvent) {
             [[BDASignalManager sharedInstance].cacheArray addObject:@{

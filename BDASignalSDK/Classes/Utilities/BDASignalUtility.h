@@ -18,66 +18,6 @@
 
 // 获取必选参数方法
 /**
- 获取idfv
- */
-+ (NSString *)idfv;
-
-/**
- 获取idfa
- */
-+ (NSString *)idfa;
-
-/**
- 获取系统更新时间
- */
-+ (NSString *)systemFileTime;
-
-/**
- 获取设备名称
- */
-+ (NSString *)deviceName;
-
-/**
- 获取设备型号
- */
-+ (NSString *)deviceModel;
-
-/**
- 获取硬件型号
- */
-+ (NSString *)hardwareModel;
-
-/**
- 获取系统启动时间
- */
-+ (NSString *)systemBootTime;
-
-/**
- 获取系统版本
- */
-+ (NSString *)systemVersion;
-
-/**
- 获取系统内存大小
- */
-+ (NSString *)systemMemorySize;
-
-/**
- 获取系统硬盘大小
- */
-+ (NSString *)systemDiskSize;
-
-/**
- 获取挂载ID
- */
-+ (NSString *)mntID;
-
-/**
- 获取设备初始化时间
- */
-+ (NSString *)deviceInitTime;
-
-/**
  获取ip列表
  */
 + (NSDictionary *)getIPAddresses;
