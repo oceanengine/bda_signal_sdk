@@ -33,15 +33,11 @@
     static BDASignalManager *manager = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        NSLocale *locale = [NSLocale currentLocale];
-        NSString *code = [locale objectForKey:NSLocaleCountryCode];
-        if ([code isEqualToString:@"CN"]) {
-            manager = [[BDASignalManager alloc] init];
-            [BDASignalUtility getInternetIpv4WithResult:^(NSString *ipv4) {
-                manager.ipv4 = ipv4;
-            }];
-            [manager preGetCachedData];
-        }
+        manager = [[BDASignalManager alloc] init];
+        [BDASignalUtility getInternetIpv4WithResult:^(NSString *ipv4) {
+            manager.ipv4 = ipv4;
+        }];
+        [manager preGetCachedData];
     });
     return manager;
 }
