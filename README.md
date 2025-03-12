@@ -17,5 +17,5 @@ pod  'Protobuf'
 
 ### 具体使用方式
 
-SDK的具体使用方式，可以参考文档：https://bytedance.feishu.cn/docx/BbFtd3JLyofo96xLc3kcYea1nTd
+SDK的具体使用方式，可以参考文档：https://bytedance.larkoffice.com/docx/CgYBdVzoBogND2xv7PhcSfFNnyc
 
