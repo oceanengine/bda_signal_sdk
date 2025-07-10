@@ -14,7 +14,7 @@ NSString *  const kBDADSignalSDKEventRegister = @"register";
 NSString *  const kBDADSignalSDKEventPurchase = @"purchase";
 NSString *  const kBDADSignalSDKEventGameAddiction = @"game_addiction";
 
-NSString *  const kBDADSignalSDKVersion = @"1.0.5";
+NSString *  const kBDADSignalSDKVersion = @"1.0.6";
 
 @implementation BDASignalDefinitions
 

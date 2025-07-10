@@ -20,6 +20,7 @@
 @property (nonatomic, assign) BOOL canCollectIdfa;
 @property (nonatomic, assign) BOOL enableDelayEvent;
 @property (nonatomic, strong) NSMutableArray *cacheArray;
+@property (nonatomic, strong) BDASignalEventUploadCallback uploadBlock;
 
 @end
 
@@ -34,6 +35,7 @@
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         manager = [[BDASignalManager alloc] init];
+        manager.canCollectIdfa = YES;
         [BDASignalUtility getInternetIpv4WithResult:^(NSString *ipv4) {
             manager.ipv4 = ipv4;
         }];
@@ -124,6 +126,16 @@
             @"event_name" : key,
             @"params" : params ?: @{}
         }];
+    }
+}
+
++ (void)registerEventUploadCallback:(BDASignalEventUploadCallback)callback {
+    [BDASignalManager sharedInstance].uploadBlock = callback;
+}
+
++ (void)handleEventUploadResult:(NSDictionary *)result {
+    if ([BDASignalManager sharedInstance].uploadBlock && result) {
+        [BDASignalManager sharedInstance].uploadBlock(result);
     }
 }
 

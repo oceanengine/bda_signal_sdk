@@ -57,6 +57,9 @@
     headerParam[@"h2"] = [appInfo objectForKey:@"CFBundleShortVersionString"];
     headerParam[@"h1"] = [appInfo objectForKey:@"CFBundleIdentifier"];
     headerParam[@"h22"] = [BDASignalManager getCacheOpenUrl];
+    headerParam[@"h23"] = [self h23];
+    headerParam[@"h24"] = [self h24];
+    headerParam[@"h25"] = [self h25];
     // ip
     NSDictionary *ips = [self getIPAddresses];
     NSMutableString *utun = [NSMutableString string];
@@ -94,6 +97,7 @@
     NSURLSession *session = [NSURLSession sharedSession];
     __weak typeof(self) weakSelf = self;
     NSURLSessionTask *task = [session dataTaskWithRequest:request completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+        NSString *message = nil;
         if (error) {
             if ([eventName isEqualToString:@"launch_app"]) {
                 // 冷启请求失败需要重试
@@ -104,8 +108,14 @@
             NSLog(@"采集SDK上报结果失败 error:%@", error.userInfo ?: @"nil");
         } else if (data) {
             NSDictionary *result = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
+            message = [result objectForKey:@"message"];
             NSLog(@"采集SDK上报结果，response：%@ message:%@ error:%@", result ?: @"", [result objectForKey:@"message"] ?: @"", error.userInfo ?: @"nil");
         }
+        [BDASignalManager handleEventUploadResult:@{
+            @"event" : eventName ?: @"",
+            @"error" : error.userInfo ?: @"null",
+            @"message" : message ?: @"",
+        }];
     }];
     [task resume];
 }
@@ -269,6 +279,36 @@
     NSString *initTime = [NSString stringWithFormat:@"%ld.%09ld", time.tv_sec, time.tv_nsec];
     cachedH11 = initTime;
     return cachedH11;
+}
+
++ (NSString *)h23 {
+    static NSString *cachedH23 = nil;
+    if (cachedH23) {
+        return cachedH23;
+    }
+    NSString *code = [[NSLocale currentLocale] objectForKey:NSLocaleCountryCode];
+    cachedH23 = code;
+    return cachedH23;
+}
+
++ (NSString *)h24 {
+    static NSString *cachedH24 = nil;
+    if (cachedH24) {
+        return cachedH24;
+    }
+    NSString *code = [[NSLocale preferredLanguages] firstObject];
+    cachedH24 = code;
+    return cachedH24;
+}
+
++ (NSString *)h25 {
+    static NSString *cachedH25 = nil;
+    if (cachedH25) {
+        return cachedH25;
+    }
+    NSTimeZone *timeZone = [NSTimeZone localTimeZone];
+    cachedH25 = [timeZone name];
+    return cachedH25;
 }
 
 + (nullable NSDictionary *)getIPAddresses
