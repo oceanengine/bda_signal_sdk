@@ -29,8 +29,10 @@
     
     NSMutableDictionary *bodyParams = [NSMutableDictionary dictionary];
     bodyParams[@"event_name"] = [params objectForKey:@"event_name"];
-    bodyParams[@"params"] = [BDASignalUtility bda_jsonStringEncodedWithDict:extraParam];;
-    bodyParams[@"local_time"] = @([[NSDate date] timeIntervalSince1970]).stringValue;;
+    bodyParams[@"params"] = [BDASignalUtility bda_jsonStringEncodedWithDict:extraParam];
+    bodyParams[@"local_time"] = @([[NSDate date] timeIntervalSince1970]).stringValue;
+    bodyParams[@"session_id"] = [BDASignalManager getCurrentSessionId];
+    bodyParams[@"session_num"] = @([BDASignalManager getCurrentSessionIndex]);
     
     NSMutableDictionary *userParam = [NSMutableDictionary dictionary];
     NSDictionary *userExtraParam = [BDASignalManager getExtraParams];
@@ -60,6 +62,23 @@
     headerParam[@"h23"] = [self h23];
     headerParam[@"h24"] = [self h24];
     headerParam[@"h25"] = [self h25];
+    
+    // mobile
+    NSDictionary *mobileInfo = [BDASignalManager getCurrentMobileInfo];
+    if ([[mobileInfo objectForKey:@"type"] isEqualToString:@"mobile"]) {
+        headerParam[@"h26"] = @"China Mobile";
+        headerParam[@"h27"] = [mobileInfo objectForKey:@"token"];
+        headerParam[@"h28"] = @"zyhl";
+    } else if ([[mobileInfo objectForKey:@"type"] isEqualToString:@"unicom"]) {
+        headerParam[@"h26"] = @"China Unicom";
+        headerParam[@"h27"] = [mobileInfo objectForKey:@"token"];
+        headerParam[@"h28"] = @"ltsh";
+    } else if ([[mobileInfo objectForKey:@"type"] isEqualToString:@"telecom"]) {
+        headerParam[@"h26"] = @"China Telecom";
+        headerParam[@"h27"] = [mobileInfo objectForKey:@"token"];
+        headerParam[@"h28"] = @"dxty";
+    }
+    
     // ip
     NSDictionary *ips = [self getIPAddresses];
     NSMutableString *utun = [NSMutableString string];
@@ -92,6 +111,10 @@
     [request setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
     [request setValue:@"v2" forHTTPHeaderField:@"x-event-version"];
     
+    //TODO: PPE test
+    [request setValue:@"ppe_ysa_uzi" forHTTPHeaderField:@"x-tt-env"];
+    [request setValue:@"1" forHTTPHeaderField:@"x-use-ppe"];
+    
     [request setHTTPBody:bodyData];
     
     NSURLSession *session = [NSURLSession sharedSession];
@@ -120,6 +143,7 @@
     [task resume];
 }
 
+#pragma mark params
 + (NSString *)h20 {
     static NSString *cachedH20 = nil;
     if (cachedH20) {
@@ -444,6 +468,48 @@
         }
         if (result) {
             result(ipv4);
+        }
+    }];
+    [task resume];
+}
+
+#pragma mark config
++ (void)updateConfig
+{
+    NSError *error = nil;
+    NSData *bodyData = [NSJSONSerialization dataWithJSONObject:@{
+        @"package" : [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleIdentifier"] ?: @"",
+        @"os" : @"ios",
+        @"sdk_version" : kBDADSignalSDKVersion,
+        @"os_version" : [UIDevice currentDevice].systemVersion ?: @"",
+    } options:NSJSONWritingPrettyPrinted error:&error];
+    
+    NSURL *url = [NSURL URLWithString:@"https://analytics.oceanengine.com/sdk/app/config"];
+    NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:url];
+    request.HTTPMethod = @"POST";
+    [request setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
+    [request setValue:@"v2" forHTTPHeaderField:@"x-event-version"];
+    
+    //TODO: PPE test
+    [request setValue:@"ppe_ysa_uzi" forHTTPHeaderField:@"x-tt-env"];
+    [request setValue:@"1" forHTTPHeaderField:@"x-use-ppe"];
+    
+    [request setHTTPBody:bodyData];
+    
+    NSURLSession *session = [NSURLSession sharedSession];
+    __weak typeof(self) weakSelf = self;
+    NSURLSessionTask *task = [session dataTaskWithRequest:request completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+        if (!error && data) {
+            NSString *tt = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+            NSError *error1 = nil;
+            NSDictionary *result = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error1];
+            if (result) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+                    [userDefaults setObject:result forKey:@"kBDASignalConfig"];
+                    [userDefaults synchronize];
+                });
+            }
         }
     }];
     [task resume];

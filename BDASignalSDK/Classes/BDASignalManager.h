@@ -69,6 +69,11 @@ typedef void(^BDASignalEventUploadCallback)(NSDictionary * _Nullable result);
 + (void)enableIdfa:(BOOL)enable;
 
 /**
+ 是否允许采集IAP事件，调用后将立即开始监听
+ */
++ (void)enablePurchaseEvent;
+
+/**
  获取idfa开关状态
  */
 + (BOOL)getIdfaStatus;
@@ -93,6 +98,29 @@ typedef void(^BDASignalEventUploadCallback)(NSDictionary * _Nullable result);
  触发注册事件上报回调
  */
 + (void)handleEventUploadResult:(NSDictionary *_Nullable)result;
+
+/**
+ 生成sessionid
+ */
++ (NSString *_Nullable)getCurrentSessionId;
+
+/**
+  获取session index
+ */
++ (NSInteger)getCurrentSessionIndex;
+
+/**
+ 获取运营商
+ */
++ (NSDictionary *_Nullable)getCurrentMobileInfo;
+
+/**
+ 支付相关事件标准上报方法
+    revenue：变现金额
+    currency：币种
+    adn：渠道
+ */
++ (void)trackPayEventWithType:(kBDASignalPayStandardEventType)type revenue:(NSNumber *_Nullable)revenue currency:(NSString *_Nullable)currency adn:(NSString *_Nullable)adn;
 
 /**
  clickid

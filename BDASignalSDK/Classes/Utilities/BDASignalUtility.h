@@ -42,6 +42,11 @@
  */
 + (void)getInternetIpv4WithResult:(void(^)(NSString *ipv4))result;
 
+/**
+ 更新配置
+ */
++ (void)updateConfig;
+
 @end
 
 
