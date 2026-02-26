@@ -489,10 +489,8 @@
     [request setHTTPBody:bodyData];
     
     NSURLSession *session = [NSURLSession sharedSession];
-    __weak typeof(self) weakSelf = self;
     NSURLSessionTask *task = [session dataTaskWithRequest:request completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
         if (!error && data) {
-            NSString *tt = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
             NSError *error1 = nil;
             NSDictionary *result = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error1];
             if (result) {

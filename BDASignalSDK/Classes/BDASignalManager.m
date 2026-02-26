@@ -400,6 +400,7 @@
     [self.requestManagerDict setObject:swiftManager forKey:type];
     [swiftManager requestTelIfNeededWithIpv4:self.ipv4 type:type with:^(NSDictionary * _Nonnull result) {
         dispatch_async(dispatch_get_main_queue(), ^{
+            __strong typeof(self) strongSelf = weakSelf;
             NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
             if (![result objectForKey:@"token"] || ![result objectForKey:@"type"] || [[result objectForKey:@"token"] isEqualToString:@"null"]) {
                 if (update) {
@@ -407,7 +408,6 @@
                     [userDefaults synchronize];
                 }
             } else {
-                __strong typeof(self) strongSelf = weakSelf;
                 NSMutableDictionary *mutDict = @{
                     @"timestamp" : @([[NSDate date] timeIntervalSince1970])
                 }.mutableCopy;
@@ -419,7 +419,7 @@
                     @"event_name" : @"launch_addition",
                 }];
             }
-            [self.requestManagerDict removeObjectForKey:type];
+            [strongSelf.requestManagerDict removeObjectForKey:type];
         });
     }];
 }
