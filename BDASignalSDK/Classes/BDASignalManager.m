@@ -14,7 +14,7 @@
 #import <WebKit/WKWebView.h>
 #import "BDASignalIDRequestLib-Swift.h"
 
-@interface BDASignalManager () <SKPaymentTransactionObserver>
+@interface BDASignalManager ()
 
 @property (nonatomic, copy) NSString *ipv4;
 @property (nonatomic, copy) NSString *webViewUA;
@@ -32,6 +32,8 @@
 @property (nonatomic, copy) NSString *sessionId;
 @property (nonatomic, copy) NSDictionary *mobileInfo;
 @property (nonatomic, strong) NSMutableDictionary *requestManagerDict;
+
+@property (nonatomic, strong) BDASignalIAPManager *iapManager;
 
 @end
 
@@ -77,6 +79,11 @@
                                                  selector:@selector(onAppWillTerminate:)
                                                      name:UIApplicationWillTerminateNotification
                                                    object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(uploadPurchaseEventWith:)
+                                                     name:@"BDATrackSignalPayEventNotification"
+                                                   object:nil];
+        
         [self collectUDIfNeeded];
         [BDASignalUtility updateConfig];
     }
@@ -308,31 +315,16 @@
 #pragma mark purchase
 - (void)collectPurchaseEventIfNeeded {
     if (self.canCollectPurchase) {
-        [[SKPaymentQueue defaultQueue] addTransactionObserver:self];
+        [self.iapManager startMonitor];
     }
 }
 
-- (void)paymentQueue:(SKPaymentQueue *)queue updatedTransactions:(NSArray<SKPaymentTransaction *> *)transactions {
-    [transactions enumerateObjectsUsingBlock:^(SKPaymentTransaction * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        switch (obj.transactionState) {
-            case SKPaymentTransactionStatePurchased: {
-                [self uploadPurchaseEventWith:obj];
-            }
-                break;
-                
-            default:
-                break;
-        }
+- (void)uploadPurchaseEventWith:(NSNotification *)noti {
+    NSDictionary *params = noti.userInfo;
+    [BDASignalUtility requestSignalWithParams:@{
+        @"event_name" : @"sdk_pay",
+        @"params" : params ?: @{},
     }];
-}
-
-- (void)uploadPurchaseEventWith:(SKPaymentTransaction *)transaction {
-    NSMutableDictionary *params = [NSMutableDictionary dictionary];
-    SKPayment *payment = transaction.payment;
-    params[@"statue"] = @(1);
-    params[@"product_id"] = payment.productIdentifier;
-    
-    
 }
 
 #pragma mark mobile info
@@ -539,6 +531,13 @@
         _requestManagerDict = [NSMutableDictionary dictionary];
     }
     return _requestManagerDict;
+}
+
+- (BDASignalIAPManager *)iapManager {
+    if (!_iapManager) {
+        _iapManager = [[BDASignalIAPManager alloc] init];
+    }
+    return _iapManager;
 }
 
 @end
