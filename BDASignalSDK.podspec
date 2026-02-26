@@ -16,8 +16,8 @@ Pod::Spec.new do |spec|
 
   spec.source       = { :git => "https://github.com/oceanengine/bda_signal_sdk.git", :branch => 'main', :tag => spec.version.to_s}
 
-
-  spec.source_files  = "BDASignalSDK", "BDASignalSDK/**/*.{h,m}"
+  spec.vendored_libraries = "BDASignalSDK/Classes/lib/libBDASignalIDRequestLib.a"
+  spec.source_files  = "BDASignalSDK", "BDASignalSDK/**/*.{h,m,swift}"
   spec.exclude_files = "Classes/Exclude"
   spec.resource_bundles = {
     'BDASignalSDK' => [
