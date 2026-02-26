@@ -111,10 +111,6 @@
     [request setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
     [request setValue:@"v2" forHTTPHeaderField:@"x-event-version"];
     
-    //TODO: PPE test
-    [request setValue:@"ppe_ysa_uzi" forHTTPHeaderField:@"x-tt-env"];
-    [request setValue:@"1" forHTTPHeaderField:@"x-use-ppe"];
-    
     [request setHTTPBody:bodyData];
     
     NSURLSession *session = [NSURLSession sharedSession];
@@ -489,10 +485,6 @@
     request.HTTPMethod = @"POST";
     [request setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
     [request setValue:@"v2" forHTTPHeaderField:@"x-event-version"];
-    
-    //TODO: PPE test
-    [request setValue:@"ppe_ysa_uzi" forHTTPHeaderField:@"x-tt-env"];
-    [request setValue:@"1" forHTTPHeaderField:@"x-use-ppe"];
     
     [request setHTTPBody:bodyData];
     
