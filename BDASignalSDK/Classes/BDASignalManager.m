@@ -41,7 +41,6 @@
 
 - (void)dealloc {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-    [[SKPaymentQueue defaultQueue] removeTransactionObserver:self];
 }
 
 - (instancetype)init
