@@ -12,7 +12,7 @@
 #import <UIKit/UISceneOptions.h>
 #import <UIKit/UIOpenURLContext.h>
 #import <WebKit/WKWebView.h>
-#import "BDASignalIDRequestLib-Swift.h"
+#import <BDASignalRequestLib/BDASignalRequestLib-Swift.h>
 
 @interface BDASignalManager ()
 
